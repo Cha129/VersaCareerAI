@@ -18,7 +18,7 @@ const TYPE_LABELS: Record<ResourceType, string> = {
 
 const TYPE_COLORS: Record<ResourceType, string> = {
   course: 'bg-primary/10 text-primary border-primary/20',
-  book: 'bg-accent/10 text-accent border-accent/20',
+  book: 'bg-primary/10 text-primary border-primary/20',
   youtube: 'bg-error/10 text-error border-error/20',
   github: 'bg-text-muted/10 text-text-muted border-text-muted/20',
   roadmap: 'bg-success/10 text-success border-success/20',
@@ -127,3 +127,4 @@ export default function Resources() {
     </motion.div>
   )
 }
+

@@ -291,7 +291,7 @@ export default function Admin() {
                   ) : aiLogs.map((l) => (
                     <tr key={l.id} className="border-b border-border last:border-0">
                       <td className="p-3 text-xs">{l.email}</td>
-                      <td className="p-3"><span className={`badge ${l.service === 'gemini' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'}`}>{l.service}</span></td>
+                      <td className="p-3"><span className={`badge ${l.service === 'gemini' ? 'bg-primary/10 text-primary' : 'bg-primary/10 text-primary'}`}>{l.service}</span></td>
                       <td className="p-3 text-xs">{l.feature}</td>
                       <td className="p-3 text-right text-xs">{l.tokens_in} / {l.tokens_out}</td>
                       <td className="p-3 text-right text-xs">${Number(l.estimated_cost_usd).toFixed(4)}</td>
@@ -375,3 +375,4 @@ function ResourceManager({ resources, onChange, onDelete }: { resources: Resourc
     </div>
   )
 }
+

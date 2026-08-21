@@ -4,6 +4,7 @@ import { LayoutDashboard, FileText, Target, Map, ArrowRight, MessageSquare, Dna,
 import { PageHeader } from '../components/DashboardLayout'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../lib/authStore'
+import { useTheme } from '../lib/useTheme'
 import type { ResumeAnalysis, Milestone } from '../lib/types'
 import { LoadingState, ScoreRing, CountUp, AnimatedProgress } from '../components/ui'
 import { Link } from 'react-router-dom'
@@ -13,6 +14,7 @@ import { EmptyIllustration } from '../components/EmptyIllustration'
 
 export default function Dashboard() {
   const { user, profile } = useAuthStore()
+  const { theme } = useTheme()
   const [latest, setLatest] = useState<ResumeAnalysis | null>(null)
   const [history, setHistory] = useState<ResumeAnalysis[]>([])
   const [milestones, setMilestones] = useState<Milestone[]>([])
@@ -119,10 +121,10 @@ export default function Dashboard() {
               <div style={{ width: '100%', height: 240 }}>
                 <ResponsiveContainer>
                   <RadarChart data={radarData}>
-                    <PolarGrid stroke="#1f2937" />
-                    <PolarAngleAxis dataKey="category" tick={{ fill: '#8b97a8', fontSize: 11 }} />
-                    <PolarRadiusAxis domain={[0, 100]} tick={{ fill: '#5a6678', fontSize: 10 }} stroke="#1f2937" />
-                    <Radar dataKey="value" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.35} animationDuration={600} animationBegin={200} />
+                    <PolarGrid stroke={theme === 'dark' ? '#1E2938' : '#E2E6EC'} />
+                    <PolarAngleAxis dataKey="category" tick={{ fill: theme === 'dark' ? '#949EAC' : '#5B6472', fontSize: 11 }} />
+                    <PolarRadiusAxis domain={[0, 100]} tick={{ fill: theme === 'dark' ? '#5B6472' : '#949EAC', fontSize: 10 }} stroke={theme === 'dark' ? '#1E2938' : '#E2E6EC'} />
+                    <Radar dataKey="value" stroke="#2E5EFF" fill="#2E5EFF" fillOpacity={0.35} animationDuration={600} animationBegin={200} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>

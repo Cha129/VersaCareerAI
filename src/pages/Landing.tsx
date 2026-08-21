@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { FileText, Dna, Target, Map, MessageSquare, ArrowRight, Lock, Server, Shield, CircleCheck as CheckCircle2 } from 'lucide-react'
 import { fadeSlideUp, staggerContainer, fadeOnly } from '../lib/motionVariants'
 
+import { ThemeToggle } from '../components/ThemeToggle'
+
 const features = [
   { icon: FileText, title: 'AI Resume Analyzer', desc: 'Upload your resume and get ATS, technical, market, and project scores with actionable suggestions.' },
   { icon: Dna, title: 'Career DNA', desc: 'A short assessment that reveals your interests, strengths, and suggested career paths.' },
@@ -14,21 +16,21 @@ const features = [
 function AnnotatedResume() {
   const scores = [
     { label: 'ATS', value: 78, color: 'text-primary' },
-    { label: 'TECH', value: 65, color: 'text-accent' },
+    { label: 'TECH', value: 65, color: 'text-primary' },
     { label: 'MKT', value: 82, color: 'text-primary' },
-    { label: 'PROJ', value: 71, color: 'text-accent' },
+    { label: 'PROJ', value: 71, color: 'text-primary' },
   ]
 
   return (
     <div className="relative w-full max-w-md mx-auto">
       {/* Resume paper */}
-      <div className="relative bg-[#f5f1e8] text-[#1a1a1c] rounded-[3px] shadow-2xl p-7 pb-10 transform rotate-[-1.5deg] transition-transform duration-500 hover:rotate-0">
+      <div className="relative bg-[#f5f1e8] text-[#0A0E14] rounded-[3px] shadow-2xl p-7 pb-10 transform rotate-[-1.5deg] transition-transform duration-500 hover:rotate-0">
         {/* Paper texture lines */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/30 to-primary/10 rounded-t-[3px]" />
 
         {/* Header */}
         <div className="border-b border-[#d4cdb8] pb-3 mb-4">
-          <div className="font-display text-lg font-semibold text-[#1a1a1c]">Jane Doe</div>
+          <div className="font-display text-lg font-semibold text-[#0A0E14]">Jane Doe</div>
           <div className="text-[10px] text-[#6b6558] font-mono mt-0.5">Senior Frontend Engineer · San Francisco</div>
         </div>
 
@@ -123,7 +125,7 @@ export default function Landing() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse at 70% 30%, rgba(201,162,39,0.06) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, rgba(122,139,111,0.04) 0%, transparent 50%)',
+            'radial-gradient(ellipse at 70% 30%, rgba(46,94,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, rgba(46,94,255,0.04) 0%, transparent 50%)',
         }}
         aria-hidden="true"
       />
@@ -135,6 +137,7 @@ export default function Landing() {
             <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer AI" className="h-9 w-auto max-w-[220px] object-contain" />
           </Link>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link to="/pricing" className="btn-ghost text-sm hidden sm:inline-flex">Pricing</Link>
             <Link to="/auth" className="btn-primary">Sign in <ArrowRight className="h-4 w-4" /></Link>
           </div>
@@ -259,7 +262,7 @@ export default function Landing() {
           ].map((t) => (
             <motion.div key={t.title} variants={fadeSlideUp} className="flex gap-3">
               <div className="h-10 w-10 rounded-[2px] bg-bg-elev flex items-center justify-center flex-shrink-0">
-                <t.icon className="h-5 w-5 text-accent" />
+                <t.icon className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-display font-medium text-sm mb-1">{t.title}</h3>
@@ -292,3 +295,4 @@ export default function Landing() {
     </div>
   )
 }
+

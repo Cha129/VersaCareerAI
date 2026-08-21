@@ -4,6 +4,7 @@ import { PageHeader } from '../components/DashboardLayout'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../lib/authStore'
 import { useAuth } from '../lib/auth'
+import { useTheme } from '../lib/useTheme'
 import { LoadingState } from '../components/ui'
 import type { CareerDNAResult } from '../lib/types'
 import {
@@ -24,6 +25,7 @@ import {
 
 export default function CareerDNA() {
   const { user, profile } = useAuthStore()
+  const { theme } = useTheme()
   const { refreshProfile } = useAuth()
   const [existing, setExisting] = useState<CareerDNAResult | null>(null)
   const [loading, setLoading] = useState(true)
@@ -277,6 +279,7 @@ function ResultsView({
   settingRole: boolean
 }) {
   const { profile } = useAuthStore()
+  const { theme } = useTheme()
   const radarData = useMemo(() => {
     const tv = result.trait_vector
     return AXIS_ORDER.map((axis: AxisKey) => ({
@@ -304,13 +307,13 @@ function ResultsView({
           <div style={{ width: '100%', height: 360 }}>
             <ResponsiveContainer>
               <RadarChart data={radarData} margin={{ top: 24, right: 48, bottom: 32, left: 48 }}>
-                <PolarGrid stroke="#3a3530" />
-                <PolarAngleAxis dataKey="axis" tick={{ fill: '#A39B8B', fontSize: 11, fontFamily: 'IBM Plex Sans' }} />
-                <PolarRadiusAxis domain={[0, 100]} tick={{ fill: '#6b655c', fontSize: 9, fontFamily: 'IBM Plex Sans' }} stroke="#3a3530" />
+                <PolarGrid stroke={theme === 'dark' ? '#1E2938' : '#E2E6EC'} />
+                <PolarAngleAxis dataKey="axis" tick={{ fill: theme === 'dark' ? '#949EAC' : '#5B6472', fontSize: 11, fontFamily: 'IBM Plex Sans' }} />
+                <PolarRadiusAxis domain={[0, 100]} tick={{ fill: theme === 'dark' ? '#5B6472' : '#949EAC', fontSize: 9, fontFamily: 'IBM Plex Sans' }} stroke={theme === 'dark' ? '#1E2938' : '#E2E6EC'} />
                 <Radar
                   dataKey="value"
-                  stroke="#C9962E"
-                  fill="#C9962E"
+                  stroke="#2E5EFF"
+                  fill="#2E5EFF"
                   fillOpacity={0.25}
                   strokeWidth={2}
                 />
@@ -323,7 +326,7 @@ function ResultsView({
               return (
                 <div key={axis} className="text-center p-2 rounded-[2px] bg-bg-soft border border-border">
                   <div className="text-[10px] font-mono text-text-faint mb-0.5">{axis}</div>
-                  <div className={`text-sm font-display font-bold ${val >= 67 ? 'text-primary' : val >= 40 ? 'text-accent' : 'text-text-muted'}`}>{val}</div>
+                  <div className={`text-sm font-display font-bold ${val >= 67 ? 'text-primary' : val >= 40 ? 'text-primary' : 'text-text-muted'}`}>{val}</div>
                 </div>
               )
             })}
@@ -362,7 +365,7 @@ function ResultsView({
                   </div>
                   <div className="h-1.5 bg-bg-elev overflow-hidden rounded-[2px]">
                     <motion.div
-                      className={`h-full rounded-[2px] ${isTop ? 'bg-primary' : 'bg-accent'}`}
+                      className={`h-full rounded-[2px] ${isTop ? 'bg-primary' : 'bg-primary'}`}
                       initial={{ width: 0 }}
                       animate={{ width: `${match.match_percent}%` }}
                       transition={{ duration: 0.7, ease: 'easeOut', delay: idx * 0.1 }}
@@ -397,3 +400,5 @@ function ResultsView({
     </motion.div>
   )
 }
+
+

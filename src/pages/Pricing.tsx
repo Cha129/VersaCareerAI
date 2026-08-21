@@ -164,7 +164,7 @@ export default function Pricing() {
 
           {/* Pro+ */}
           <PlanCard
-            icon={<Sparkles className="h-5 w-5 text-accent" />}
+            icon={<Sparkles className="h-5 w-5 text-primary" />}
             name="Pro+"
             price={billing === 'monthly' ? `₹${PLAN_PRICING.PRO_PLUS.monthly}` : `₹${PLAN_PRICING.PRO_PLUS.yearly}`}
             period={billing === 'monthly' ? '/mo' : '/yr'}
@@ -262,7 +262,7 @@ export default function Pricing() {
                 <th className="text-left p-4 font-medium text-text-muted">Feature</th>
                 <th className="p-4 font-medium">Free</th>
                 <th className="p-4 font-medium text-primary">Pro</th>
-                <th className="p-4 font-medium text-accent">Pro+</th>
+                <th className="p-4 font-medium text-primary">Pro+</th>
                 <th className="p-4 font-medium text-warning">Founder</th>
               </tr>
             </thead>
@@ -290,7 +290,7 @@ export default function Pricing() {
                   <td className="p-4 text-text-muted">{row[0]}</td>
                   <td className="p-4 text-center">{row[1]}</td>
                   <td className="p-4 text-center text-primary">{row[2]}</td>
-                  <td className="p-4 text-center text-accent">{row[3]}</td>
+                  <td className="p-4 text-center text-primary">{row[3]}</td>
                   <td className="p-4 text-center text-warning">{row[4]}</td>
                 </tr>
               ))}
@@ -309,7 +309,7 @@ export default function Pricing() {
           ].map((t) => (
             <motion.div key={t.title} variants={fadeSlideUp} className="flex gap-3">
               <div className="h-10 w-10 rounded-[2px] bg-bg-elev flex items-center justify-center flex-shrink-0">
-                <t.icon className="h-5 w-5 text-accent" />
+                <t.icon className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-medium text-sm mb-1">{t.title}</h3>
@@ -372,3 +372,4 @@ function PlanCard({
     </motion.div>
   )
 }
+

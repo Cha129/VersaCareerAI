@@ -3,6 +3,7 @@ import { Target, ChevronDown } from 'lucide-react'
 import { PageHeader } from '../components/DashboardLayout'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../lib/authStore'
+import { useTheme } from '../lib/useTheme'
 import { CAREER_PATHS, type ResumeAnalysis } from '../lib/types'
 import { LoadingState, EmptyState, ErrorState } from '../components/ui'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
@@ -63,6 +64,7 @@ function priority(missing: string, target: string): 'HIGH' | 'MEDIUM' | 'LOW' {
 
 export default function SkillGap() {
   const { user, profile } = useAuthStore()
+  const { theme } = useTheme()
   const isProPlus = profile?.plan === 'PRO_PLUS' || profile?.is_founder === true
   const [latest, setLatest] = useState<ResumeAnalysis | null>(null)
   const [target, setTarget] = useState<string>(CAREER_PATHS[0])
@@ -143,10 +145,10 @@ export default function SkillGap() {
           <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
               <RadarChart data={radarData}>
-                <PolarGrid stroke="#1f2937" />
-                <PolarAngleAxis dataKey="category" tick={{ fill: '#8b97a8', fontSize: 12 }} />
-                <PolarRadiusAxis domain={[0, 100]} tick={{ fill: '#5a6678', fontSize: 10 }} stroke="#1f2937" />
-                <Radar dataKey="coverage" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.35} />
+                <PolarGrid stroke={theme === 'dark' ? '#1E2938' : '#E2E6EC'} />
+                <PolarAngleAxis dataKey="category" tick={{ fill: theme === 'dark' ? '#949EAC' : '#5B6472', fontSize: 12 }} />
+                <PolarRadiusAxis domain={[0, 100]} tick={{ fill: theme === 'dark' ? '#5B6472' : '#949EAC', fontSize: 10 }} stroke={theme === 'dark' ? '#1E2938' : '#E2E6EC'} />
+                <Radar dataKey="coverage" stroke="#2E5EFF" fill="#2E5EFF" fillOpacity={0.35} />
               </RadarChart>
             </ResponsiveContainer>
           </div>

@@ -31,7 +31,7 @@ function HeroObject({ visible }: { visible: boolean }) {
       <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.6}>
         <Icosahedron ref={mesh} args={[1.6, 4]}>
           <MeshDistortMaterial
-            color="#2563EB"
+            color="#2E5EFF"
             emissive="#22D3EE"
             emissiveIntensity={0.25}
             roughness={0.15}
@@ -124,7 +124,7 @@ export default function HeroScene3D() {
         style={{ background: 'transparent' }}
       >
         <ambientLight intensity={0.35} />
-        <pointLight position={[5, 5, 5]} intensity={1.2} color="#2563EB" />
+        <pointLight position={[5, 5, 5]} intensity={1.2} color="#2E5EFF" />
         <pointLight position={[-5, -3, 2]} intensity={0.7} color="#22D3EE" />
         <directionalLight position={[0, 2, 4]} intensity={0.4} color="#ffffff" />
         <HeroObject visible={inView} />

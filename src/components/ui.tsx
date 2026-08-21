@@ -42,12 +42,12 @@ export function ScoreRing({ score, size = 120, label }: { score: number; size?: 
   const r = (size - 12) / 2
   const c = 2 * Math.PI * r
   const offset = c - (score / 100) * c
-  const color = score >= 75 ? '#7a8b6f' : score >= 50 ? '#c9a227' : '#c0392b'
+  const color = score >= 75 ? 'rgb(var(--color-success))' : score >= 50 ? 'rgb(var(--color-warning))' : 'rgb(var(--color-error))'
   return (
     <div className="flex flex-col items-center">
       <div className="relative" style={{ width: size, height: size }}>
         <svg width={size} height={size} className="-rotate-90">
-          <circle cx={size/2} cy={size/2} r={r} stroke="#2a2a2e" strokeWidth="6" fill="none" />
+          <circle cx={size/2} cy={size/2} r={r} stroke="rgb(var(--color-border))" strokeWidth="6" fill="none" />
           <circle
             cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth="6" fill="none"
             strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"

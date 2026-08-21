@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { useAuthStore } from '../lib/authStore'
 import FeedbackWidget from './FeedbackWidget'
+import { ThemeToggle } from './ThemeToggle'
 import {
   LayoutDashboard, FileText, Dna, Target, Map, MessageSquare,
   User, LogOut, Sparkles, BookOpen, Shield, Crown,
@@ -45,10 +46,11 @@ export default function DashboardLayout() {
     <div className="min-h-screen bg-bg flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-border bg-bg-soft">
-        <div className="px-5 py-5 border-b border-border">
+        <div className="px-5 py-5 border-b border-border flex items-center justify-between">
           <Link to="/" aria-label="VersaCareer AI home" className="inline-flex items-center">
             <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer AI" className="h-9 w-auto max-w-full object-contain" />
           </Link>
+          <ThemeToggle className="scale-90 opacity-75 hover:opacity-100" />
         </div>
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {nav.map((n) => (
@@ -72,7 +74,7 @@ export default function DashboardLayout() {
                 to="/admin"
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-[2px] px-3 py-2.5 text-sm transition-colors duration-150 ${
-                    isActive ? 'bg-accent/10 text-accent border-l-2 border-accent' : 'text-text-muted hover:text-text hover:bg-bg-elev border-l-2 border-transparent'
+                    isActive ? 'bg-primary/10 text-primary border-l-2 border-primary' : 'text-text-muted hover:text-text hover:bg-bg-elev border-l-2 border-transparent'
                   }`
                 }
               >
@@ -115,6 +117,7 @@ export default function DashboardLayout() {
             <img src="/assets/brand/VersaCareer_AI_Icon_Gold.png" alt="VersaCareer AI" className="h-7 w-7 object-contain" />
           </Link>
           <div className="flex items-center gap-2">
+            <ThemeToggle className="scale-90" />
             {profile?.plan === 'FREE' && (
               <button onClick={() => navigate('/billing')} className="btn-ghost px-2 py-1.5 text-xs">
                 <Crown className="h-3.5 w-3.5 text-warning" />
@@ -145,7 +148,7 @@ export default function DashboardLayout() {
           {isAdmin && (
             <NavLink to="/admin" className={({ isActive }) =>
               `flex items-center gap-1.5 rounded-[2px] px-3 py-1.5 text-xs whitespace-nowrap ${
-                isActive ? 'bg-accent/10 text-accent' : 'text-text-muted'
+                isActive ? 'bg-primary/10 text-primary' : 'text-text-muted'
               }`
             }>
               <Shield className="h-3.5 w-3.5" /> Admin
@@ -192,3 +195,4 @@ export function ProBadge() {
     </span>
   )
 }
+

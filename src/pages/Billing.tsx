@@ -108,7 +108,7 @@ export default function Billing() {
             {isFounder ? (
               <><InfinityIcon className="h-5 w-5 text-warning" /> Founder Pass</>
             ) : currentPlan === 'PRO_PLUS' ? (
-              <><Sparkles className="h-5 w-5 text-accent" /> Pro+</>
+              <><Sparkles className="h-5 w-5 text-primary" /> Pro+</>
             ) : currentPlan === 'PRO' ? (
               <><Crown className="h-5 w-5 text-warning" /> Pro</>
             ) : (
@@ -169,7 +169,7 @@ export default function Billing() {
 
         {/* Pro+ */}
         <PlanCard
-          icon={<Sparkles className="h-5 w-5 text-accent" />}
+          icon={<Sparkles className="h-5 w-5 text-primary" />}
           name="Pro+"
           price={billing === 'monthly' ? `₹${PLAN_PRICING.PRO_PLUS.monthly}` : `₹${PLAN_PRICING.PRO_PLUS.yearly}`}
           period={billing === 'monthly' ? '/mo' : '/yr'}
@@ -276,3 +276,4 @@ function PlanCard({
     </motion.div>
   )
 }
+
