@@ -1,6 +1,14 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('versacareer-theme');
+          if (t === 'light') document.documentElement.classList.add('light');
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" href="/assets/brand/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/brand/icon-512.png" />
@@ -19,8 +27,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <title>VersaCareer AI — Career Intelligence by Pragma</title>
-    <script type="module" crossorigin src="/assets/index-C0ZqRZWj.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Bm7zuXlb.css">
+    <script type="module" crossorigin src="/assets/index-vB4287jV.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DSL22hah.css">
   </head>
   <body class="bg-bg text-text">
     <div id="root"></div>

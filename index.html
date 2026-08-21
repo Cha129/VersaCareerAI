@@ -1,6 +1,14 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('versacareer-theme');
+          if (t === 'light') document.documentElement.classList.add('light');
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" href="/assets/brand/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/brand/icon-512.png" />
