@@ -24,6 +24,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setLoading(false)
       }
+    }).catch(err => {
+      console.warn("Supabase auth error:", err)
+      if (mounted) setLoading(false)
     })
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -87,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try { await supabase.auth.signOut() } catch (err) { console.warn(err) }
     setProfile(null)
   }
 

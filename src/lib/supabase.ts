@@ -4,15 +4,18 @@ const url = import.meta.env.VITE_SUPABASE_URL as string
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
 if (!url || !anonKey) {
-  throw new Error('Missing Supabase env vars. Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.')
+  console.warn('Missing Supabase env vars. Supabase client is unconfigured.')
 }
 
-export const supabase = createClient(url, anonKey, {
+const finalUrl = url || 'https://placeholder.supabase.co'
+const finalAnonKey = anonKey || 'placeholder'
+
+export const supabase = createClient(finalUrl, finalAnonKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 })
 
-export const SUPABASE_URL = url
-export const SUPABASE_ANON_KEY = anonKey
+export const SUPABASE_URL = finalUrl
+export const SUPABASE_ANON_KEY = finalAnonKey
 
 export async function callEdgeFunction<T = any>(name: string, body: any): Promise<T> {
   const { data: session } = await supabase.auth.getSession()

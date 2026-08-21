@@ -23,7 +23,7 @@ import { usePageFade } from './lib/motionVariants'
 function Protected({ children }: { children: JSX.Element }) {
   const { user, loading, profile } = useAuthStore()
   if (loading) return <FullLoader />
-  if (!user) return <Navigate to="/auth" replace />
+  if (!user) return <Navigate to="/" replace />
   // First login with no career prefs → onboarding (but allow skip)
   if (profile && !profile.experience_level && !profile.preferred_work_style && (profile.target_roles ?? []).length === 0 && window.location.pathname !== '/onboarding' && !sessionStorage.getItem('onboarded')) {
     return <Navigate to="/onboarding" replace />
@@ -34,8 +34,8 @@ function Protected({ children }: { children: JSX.Element }) {
 function AdminRoute({ children }: { children: JSX.Element }) {
   const { user, loading, profile } = useAuthStore()
   if (loading) return <FullLoader />
-  if (!user) return <Navigate to="/auth" replace />
-  if (profile?.role !== 'ADMIN') return <Navigate to="/dashboard" replace />
+  if (!user) return <Navigate to="/" replace />
+  if (profile?.role !== 'ADMIN') return <Navigate to="/" replace />
   return children
 }
 
@@ -48,9 +48,9 @@ export default function App() {
     <AnimatePresence mode="wait">
     <motion.div key={location.pathname} initial={pageFade.initial} animate={pageFade.animate} exit={pageFade.exit}>
     <Routes location={location}>
-      <Route path="/" element={loading ? <FullLoader /> : user ? <Navigate to="/dashboard" replace /> : <Landing />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/pricing" element={<Pricing />} />
-      <Route path="/auth" element={loading ? <FullLoader /> : user ? <Navigate to="/dashboard" replace /> : <AuthPage />} />
+      <Route path="/auth" element={<AuthPage />} />
       <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
       <Route element={<Protected><DashboardLayout /></Protected>}>
         <Route path="/dashboard" element={<Dashboard />} />
