@@ -155,13 +155,15 @@ export default function Mentor() {
               className="flex gap-2"
             >
               <input
+                id="mentor-input"
+                aria-label="Your message to the mentor"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask your mentor…"
                 className="input flex-1"
                 disabled={sending}
               />
-              <button type="submit" disabled={sending || !input.trim()} className="btn-primary">
+              <button type="submit" disabled={sending || !input.trim()} className="btn-primary" aria-label="Send message">
                 <Send className="h-4 w-4" />
               </button>
             </form>

@@ -80,13 +80,27 @@ export default function AuthPage() {
     }
   }
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {}
+    if (mode === 'signup' && !name.trim()) newErrors.name = 'Name is required'
+    if (!email.trim()) newErrors.email = 'Email is required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Invalid email address'
+    if (!password) newErrors.password = 'Password is required'
+    else if (mode === 'signup' && password.length < 6) newErrors.password = 'Password must be at least 6 characters'
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!validate()) return
     if (loading) return
     setLoading(true)
     try {
       if (mode === 'signup') {
-        if (password.length < 6) throw new Error('Password must be at least 6 characters.')
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -151,29 +165,32 @@ export default function AuthPage() {
             <div className="h-px flex-1 bg-border" />
           </motion.div>
 
-          <motion.form variants={fsu} onSubmit={submit} className="card p-6 space-y-4">
+          <motion.form variants={fsu} onSubmit={submit} className="card p-6 space-y-4" noValidate>
             {mode === 'signup' && (
               <div>
-                <label className="label">Full name</label>
+                <label htmlFor="auth-name" className="label">Full name</label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                  <input className="input pl-10" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
+                  <input id="auth-name" className={`input pl-10 ${errors.name ? 'border-error' : ''}`} aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => { setName(e.target.value); if (errors.name) setErrors(prev => ({ ...prev, name: '' })) }} />
                 </div>
+                {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
               </div>
             )}
             <div>
-              <label className="label">Email</label>
+              <label htmlFor="auth-email" className="label">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                <input type="email" required className="input pl-10" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input id="auth-email" type="email" className={`input pl-10 ${errors.email ? 'border-error' : ''}`} placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: '' })) }} />
               </div>
+              {errors.email && <p className="text-error text-xs mt-1">{errors.email}</p>}
             </div>
             <div>
-              <label className="label">Password</label>
+              <label htmlFor="auth-password" className="label">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                <input type="password" required className="input pl-10" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <input id="auth-password" type="password" className={`input pl-10 ${errors.password ? 'border-error' : ''}`} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(prev => ({ ...prev, password: '' })) }} />
               </div>
+              {errors.password && <p className="text-error text-xs mt-1">{errors.password}</p>}
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}

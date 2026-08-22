@@ -119,11 +119,11 @@ export default function DashboardLayout() {
           <div className="flex items-center gap-2">
             <ThemeToggle className="scale-90" />
             {profile?.plan === 'FREE' && (
-              <button onClick={() => navigate('/billing')} className="btn-ghost px-2 py-1.5 text-xs">
+              <button onClick={() => navigate('/billing')} className="btn-ghost px-2 py-1.5 text-xs" aria-label="Upgrade to Pro">
                 <Crown className="h-3.5 w-3.5 text-warning" />
               </button>
             )}
-            <button onClick={handleSignOut} className="btn-ghost px-2 py-1.5">
+            <button onClick={handleSignOut} className="btn-ghost px-2 py-1.5" aria-label="Sign out">
               <LogOut className="h-4 w-4" />
             </button>
           </div>

@@ -51,10 +51,25 @@ export default function FeedbackWidget() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 w-80 card p-4 animate-slide-up">
+    <div 
+      className="fixed bottom-5 right-5 z-40 w-80 card p-4 animate-slide-up"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="feedback-title"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') setOpen(false)
+      }}
+      ref={(el) => {
+        if (el && !el.contains(document.activeElement)) {
+          // simple focus on mount
+          const focusable = el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement
+          if (focusable) focusable.focus()
+        }
+      }}
+    >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium text-sm">How is this page?</h3>
-        <button onClick={() => setOpen(false)} className="text-text-faint hover:text-text">
+        <h3 id="feedback-title" className="font-medium text-sm">How is this page?</h3>
+        <button onClick={() => setOpen(false)} className="text-text-faint hover:text-text" aria-label="Close feedback">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -62,6 +77,7 @@ export default function FeedbackWidget() {
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
+            aria-label={`Rate ${n} out of 5`}
             onClick={() => setRating(n)}
             onMouseEnter={() => setHover(n)}
             onMouseLeave={() => setHover(0)}

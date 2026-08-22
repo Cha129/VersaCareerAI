@@ -18,7 +18,9 @@ import CareerGoals from './pages/CareerGoals'
 import Resources from './pages/Resources'
 import Billing from './pages/Billing'
 import Admin from './pages/Admin'
+import NotFound from './pages/NotFound'
 import { usePageFade } from './lib/motionVariants'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function Protected({ children }: { children: JSX.Element }) {
   const { user, loading, profile } = useAuthStore()
@@ -56,11 +58,11 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/career-goals" element={<CareerGoals />} />
-        <Route path="/analysis" element={<Analysis />} />
+        <Route path="/analysis" element={<ErrorBoundary inline fallbackMessage="Couldn't display this analysis — try again"><Analysis /></ErrorBoundary>} />
         <Route path="/career-dna" element={<CareerDNA />} />
         <Route path="/skill-gap" element={<SkillGap />} />
-        <Route path="/roadmap" element={<Roadmap />} />
-        <Route path="/mentor" element={<Mentor />} />
+        <Route path="/roadmap" element={<ErrorBoundary inline fallbackMessage="Couldn't display your roadmap — try again"><Roadmap /></ErrorBoundary>} />
+        <Route path="/mentor" element={<ErrorBoundary inline fallbackMessage="Couldn't load the mentor chat — try again"><Mentor /></ErrorBoundary>} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/billing" element={<Billing />} />
@@ -68,7 +70,7 @@ export default function App() {
       <Route element={<AdminRoute><DashboardLayout /></AdminRoute>}>
         <Route path="/admin" element={<Admin />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
     </motion.div>
     </AnimatePresence>

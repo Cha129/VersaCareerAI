@@ -99,8 +99,17 @@ export default function Upload() {
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); onPick(e.dataTransfer.files?.[0] ?? null) }}
-        className="card border-dashed border-2 p-10 text-center cursor-pointer hover:border-primary/50 transition-colors"
+        className="card border-dashed border-2 p-10 text-center cursor-pointer hover:border-primary/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         onClick={() => inputRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        aria-label="Upload resume file, click or drag and drop"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            inputRef.current?.click()
+          }
+        }}
       >
         <input
           ref={inputRef}
@@ -121,6 +130,7 @@ export default function Upload() {
             <button
               onClick={(e) => { e.stopPropagation(); setFile(null) }}
               className="ml-2 text-text-faint hover:text-error"
+              aria-label="Remove selected file"
             >
               <X className="h-4 w-4" />
             </button>

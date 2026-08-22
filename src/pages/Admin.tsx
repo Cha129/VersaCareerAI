@@ -180,7 +180,7 @@ export default function Admin() {
             <div>
               <div className="relative max-w-sm mb-4">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                <input className="input pl-10" placeholder="Search by name or email…" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
+                <input className="input pl-10" aria-label="Search users" placeholder="Search by name or email…" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
               </div>
               <div className="card overflow-x-auto">
                 <table className="w-full text-sm">
@@ -344,17 +344,17 @@ function ResourceManager({ resources, onChange, onDelete }: { resources: Resourc
       </div>
       {showForm && (
         <div className="card p-5 mb-4 grid sm:grid-cols-2 gap-3">
-          <input className="input" placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-          <input className="input" placeholder="URL" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
-          <select className="input" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as ResourceType })}>
+          <input className="input" aria-label="Resource title" placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+          <input className="input" aria-label="Resource URL" placeholder="URL" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
+          <select className="input" aria-label="Resource type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as ResourceType })}>
             <option value="course">Course</option>
             <option value="book">Book</option>
             <option value="youtube">YouTube</option>
             <option value="github">GitHub</option>
             <option value="roadmap">Roadmap</option>
           </select>
-          <input className="input" placeholder="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-          <input className="input sm:col-span-2" placeholder="Skill tags (comma-separated)" value={form.skill_tags} onChange={(e) => setForm({ ...form, skill_tags: e.target.value })} />
+          <input className="input" aria-label="Resource category" placeholder="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+          <input className="input sm:col-span-2" aria-label="Skill tags" placeholder="Skill tags (comma-separated)" value={form.skill_tags} onChange={(e) => setForm({ ...form, skill_tags: e.target.value })} />
           <button onClick={create} className="btn-primary sm:col-span-2">Create</button>
         </div>
       )}

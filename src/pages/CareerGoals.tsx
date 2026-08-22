@@ -41,8 +41,18 @@ export default function CareerGoals() {
   }
   useEffect(() => { load() }, [user]) // eslint-disable-line
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {}
+    if (!form.title.trim()) newErrors.title = 'Title is required'
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const create = async () => {
-    if (!form.title.trim()) { toast.error('Title is required.'); return }
+    if (!validate()) return
     setSaving(true)
     try {
       const { data, error } = await supabase.from('career_goals').insert({
@@ -118,22 +128,23 @@ export default function CareerGoals() {
 
         {showForm && (
           <motion.div variants={fadeSlideUp} className="card p-5 mb-4 space-y-4">
-            <div>
-              <label className="label">Title</label>
-              <input className="input" placeholder="e.g. Get AWS Solutions Architect certified" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            <div className="space-y-1">
+              <label htmlFor="goal-title" className="label">Title</label>
+              <input id="goal-title" className={`input ${errors.title ? 'border-error' : ''}`} placeholder="e.g. Get AWS Solutions Architect certified" value={form.title} onChange={(e) => { setForm({ ...form, title: e.target.value }); if (errors.title) setErrors(prev => ({ ...prev, title: '' })) }} />
+              {errors.title && <p className="text-error text-xs mt-1">{errors.title}</p>}
             </div>
-            <div>
-              <label className="label">Description (optional)</label>
-              <textarea className="input min-h-[60px]" placeholder="Why this goal matters, what success looks like…" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <div className="space-y-1">
+              <label htmlFor="goal-description" className="label">Description (optional)</label>
+              <textarea id="goal-description" className="input min-h-[80px] resize-y" placeholder="Any specific details." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="label">Target date (optional)</label>
-                <input type="date" className="input" value={form.target_date} onChange={(e) => setForm({ ...form, target_date: e.target.value })} />
+              <div className="space-y-1">
+                <label htmlFor="goal-target-date" className="label">Target date (optional)</label>
+                <input id="goal-target-date" type="date" className="input" value={form.target_date} onChange={(e) => setForm({ ...form, target_date: e.target.value })} />
               </div>
               <div>
-                <label className="label">Link to milestone (optional)</label>
-                <select className="input" value={form.milestone_id} onChange={(e) => setForm({ ...form, milestone_id: e.target.value })}>
+                <label htmlFor="goal-milestone" className="label">Link to milestone (optional)</label>
+                <select id="goal-milestone" className="input" value={form.milestone_id || ''} onChange={(e) => setForm({ ...form, milestone_id: e.target.value || '' })}>
                   <option value="">None</option>
                   {milestones.map((m) => (
                     <option key={m.id} value={m.id}>Week {m.week}: {m.title}</option>
@@ -143,7 +154,7 @@ export default function CareerGoals() {
             </div>
             <div className="flex gap-3">
               <button onClick={create} disabled={saving} className="btn-primary">{saving ? 'Saving…' : 'Create goal'}</button>
-              <button onClick={() => setShowForm(false)} className="btn-ghost">Cancel</button>
+              <button onClick={() => { setShowForm(false); setErrors({}); setForm({ title: '', description: '', target_date: '', milestone_id: '' }) }} className="btn-ghost">Cancel</button>
             </div>
           </motion.div>
         )}
@@ -180,7 +191,7 @@ export default function CareerGoals() {
                         </span>
                       </div>
                     </div>
-                    <button onClick={() => remove(goal.id)} className="text-text-faint hover:text-error shrink-0"><Trash2 className="h-4 w-4" /></button>
+                    <button onClick={() => remove(goal.id)} className="text-text-faint hover:text-error shrink-0" aria-label="Delete goal"><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </motion.div>
               )

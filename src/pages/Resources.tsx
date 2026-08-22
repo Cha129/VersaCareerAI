@@ -75,17 +75,18 @@ export default function Resources() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
             <input
               className="input pl-10"
+              aria-label="Search resources"
               placeholder="Search by title, skill, or category…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <div className="flex gap-3">
-            <select className="input min-w-[140px]" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+            <select className="input min-w-[140px]" aria-label="Filter by resource type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
               <option value="all">All types</option>
               {types.map((t) => <option key={t} value={t}>{TYPE_LABELS[t as ResourceType]}</option>)}
             </select>
-            <select className="input min-w-[140px]" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+            <select className="input min-w-[140px]" aria-label="Filter by resource category" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
               <option value="all">All categories</option>
               {categories.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>

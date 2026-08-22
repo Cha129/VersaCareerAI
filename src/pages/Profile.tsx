@@ -38,8 +38,20 @@ export default function Profile() {
     setTargetRoles((prev) => prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r])
   }
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {}
+    if (!name.trim()) newErrors.name = 'Full name is required'
+    if (!jobTitle.trim()) newErrors.jobTitle = 'Job title is required'
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const save = async () => {
     if (!profile) return
+    if (!validate()) return
     setSaving(true)
     try {
       const { data, error } = await supabase
@@ -100,16 +112,18 @@ export default function Profile() {
           <h3 className="font-medium mb-4">Edit details</h3>
           <div className="space-y-4">
             <div>
-              <label className="label">Full name</label>
-              <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+              <label htmlFor="profile-name" className="label">Full name</label>
+              <input id="profile-name" className={`input ${errors.name ? 'border-error' : ''}`} value={name} onChange={(e) => { setName(e.target.value); if (errors.name) setErrors(prev => ({ ...prev, name: '' })) }} placeholder="Your name" />
+              {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
             </div>
             <div>
-              <label className="label">Job title / target role</label>
-              <input className="input" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="e.g. Software Engineer" />
+              <label htmlFor="profile-job-title" className="label">Job title / target role</label>
+              <input id="profile-job-title" className={`input ${errors.jobTitle ? 'border-error' : ''}`} value={jobTitle} onChange={(e) => { setJobTitle(e.target.value); if (errors.jobTitle) setErrors(prev => ({ ...prev, jobTitle: '' })) }} placeholder="e.g. Software Engineer" />
+              {errors.jobTitle && <p className="text-error text-xs mt-1">{errors.jobTitle}</p>}
             </div>
             <div>
-              <label className="label">Email</label>
-              <input className="input opacity-60 cursor-not-allowed" value={profile.email} disabled />
+              <label htmlFor="profile-email" className="label">Email</label>
+              <input id="profile-email" className="input opacity-60 cursor-not-allowed" value={profile.email} disabled />
             </div>
 
             <div className="pt-2 border-t border-border">
