@@ -138,8 +138,8 @@ export default function Landing() {
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Link to="/pricing" className="btn-ghost text-sm hidden sm:inline-flex">Pricing</Link>
-            <Link to="/dashboard" className="btn-primary">Go to Dashboard <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/auth?mode=signin" className="btn-ghost text-sm hidden sm:inline-flex">Sign in</Link>
+            <Link to="/auth?mode=signup" className="btn-primary">Get started <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </div>
       </header>
@@ -189,7 +189,7 @@ export default function Landing() {
               transition={{ duration: 0.4, delay: 0.25 }}
               className="flex items-center gap-3 flex-wrap"
             >
-              <Link to="/dashboard" className="btn-primary text-base px-6 py-3">Get started free <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/auth?mode=signup" className="btn-primary text-base px-6 py-3">Get started free <ArrowRight className="h-4 w-4" /></Link>
               <Link to="/pricing" className="btn-secondary text-base px-6 py-3">See pricing</Link>
             </motion.div>
             <motion.div
@@ -283,7 +283,14 @@ export default function Landing() {
       >
         <h2 className="text-3xl font-display font-semibold mb-4">Start with your first resume analysis</h2>
         <p className="text-text-muted mb-8">Free. Takes two minutes. No credit card.</p>
-        <Link to="/dashboard" className="btn-primary text-base px-6 py-3 inline-flex">Start for free <ArrowRight className="h-4 w-4" /></Link>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+          <Link to="/auth?mode=signup" className="btn-primary text-base px-6 py-3 inline-flex">
+            No existing account? Create one <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link to="/auth?mode=signin" className="text-primary hover:underline font-medium text-sm">
+            Already have an account? Sign in
+          </Link>
+        </div>
       </motion.section>
 
       <footer className="border-t border-border relative z-10 bg-[#0A0A08]">

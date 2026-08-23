@@ -1,10 +1,9 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { ArrowLeft, Mail, Lock, User as UserIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { fadeSlideUp, fadeOnly, staggerContainer } from '../lib/motionVariants'
 import { useMotionVariants } from '../lib/motionVariants'
 
 type Mode = 'signin' | 'signup'
@@ -50,18 +49,25 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 const OAUTH_PROVIDERS: { provider: OAuthProvider; label: string; Icon: (p: { className?: string }) => JSX.Element }[] = [
   { provider: 'google', label: 'Continue with Google', Icon: GoogleIcon },
+  { provider: 'linkedin_oidc', label: 'Continue with LinkedIn', Icon: LinkedInIcon },
   { provider: 'github', label: 'Continue with GitHub', Icon: GitHubIcon },
   { provider: 'azure', label: 'Continue with Microsoft', Icon: MicrosoftIcon },
-  { provider: 'linkedin_oidc', label: 'Continue with LinkedIn', Icon: LinkedInIcon },
 ]
 
 export default function AuthPage() {
-  const [mode, setMode] = useState<Mode>('signup')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const mode: Mode = searchParams.get('mode') === 'signin' ? 'signin' : 'signup'
+  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
+  
   const [loading, setLoading] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  
   const navigate = useNavigate()
   const { fadeSlideUp: fsu, staggerContainer: stagger, fadeOnly: fo } = useMotionVariants()
 
@@ -80,18 +86,40 @@ export default function AuthPage() {
     }
   }
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
-
   const validate = () => {
     const newErrors: { [key: string]: string } = {}
     if (mode === 'signup' && !name.trim()) newErrors.name = 'Name is required'
     if (!email.trim()) newErrors.email = 'Email is required'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Invalid email address'
+    
     if (!password) newErrors.password = 'Password is required'
     else if (mode === 'signup' && password.length < 6) newErrors.password = 'Password must be at least 6 characters'
     
+    if (mode === 'signup' && password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match'
+    }
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
+  }
+
+  const handleResetPassword = async () => {
+    if (!email.trim()) {
+      setErrors({ email: 'Please enter your email first' })
+      return
+    }
+    setResetting(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/dashboard`,
+      })
+      if (error) throw error
+      toast.success('Password reset email sent.')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to send reset email.')
+    } finally {
+      setResetting(false)
+    }
   }
 
   const submit = async (e: React.FormEvent) => {
@@ -108,17 +136,18 @@ export default function AuthPage() {
         })
         if (error) throw error
         if (data.user && !data.session) {
-          toast.success('Account created. Please sign in.')
-          setMode('signin')
+          toast.success('Account created. Please check your email to sign in.')
           setPassword('')
+          setConfirmPassword('')
+          setSearchParams({ mode: 'signin' })
           return
         }
         toast.success('Welcome to VersaCareer AI!')
-        navigate('/dashboard')
+        navigate('/onboarding')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
-        toast.success('Signed in.')
+        toast.success('Signed in successfully.')
         navigate('/dashboard')
       }
     } catch (err: any) {
@@ -133,17 +162,14 @@ export default function AuthPage() {
       <header className="px-4 md:px-8 h-16 flex items-center">
         <Link to="/" className="btn-ghost"><ArrowLeft className="h-4 w-4" /> Back</Link>
       </header>
-      <div className="flex-1 flex items-center justify-center px-4">
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
         <motion.div initial="hidden" animate="visible" variants={fo} className="w-full max-w-md">
           <motion.div variants={fsu} className="text-center mb-8">
-            <img src="/VersaCareer_AI_Logo.png" alt="" className="h-14 w-14 rounded-[3px] mx-auto mb-4" />
+            <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer AI" className="h-14 w-auto rounded-[3px] mx-auto mb-4 object-contain" />
             <h1 className="text-2xl font-semibold">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h1>
-            <p className="text-text-muted text-sm mt-1">
-              {mode === 'signup' ? 'Start your career intelligence journey.' : 'Sign in to continue.'}
-            </p>
           </motion.div>
 
-          <motion.div variants={stagger(60)} className="space-y-2.5 mb-4">
+          <motion.div variants={stagger(60)} className="space-y-2.5 mb-4 flex flex-col">
             {OAUTH_PROVIDERS.map(({ provider, label, Icon }) => (
               <motion.button
                 key={provider}
@@ -151,7 +177,7 @@ export default function AuthPage() {
                 type="button"
                 onClick={() => handleOAuthLogin(provider)}
                 disabled={oauthLoading !== null}
-                className="btn-ghost w-full flex items-center justify-center gap-3 py-2.5 border border-border bg-brand-card hover:bg-brand-card/80 transition-colors disabled:opacity-50"
+                className="btn-ghost w-full flex items-center justify-center gap-3 py-2.5 border border-border bg-bg-card hover:bg-bg-elev transition-colors disabled:opacity-50 min-h-[44px]"
               >
                 <Icon className="h-4 w-4 shrink-0" />
                 <span>{oauthLoading === provider ? 'Redirecting…' : label}</span>
@@ -159,9 +185,9 @@ export default function AuthPage() {
             ))}
           </motion.div>
 
-          <motion.div variants={fsu} className="flex items-center gap-3 my-5">
+          <motion.div variants={fsu} className="flex items-center gap-3 my-6">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-text-faint uppercase tracking-wider">or continue with</span>
+            <span className="text-xs text-text-faint uppercase tracking-wider">or continue with email</span>
             <div className="h-px flex-1 bg-border" />
           </motion.div>
 
@@ -171,7 +197,7 @@ export default function AuthPage() {
                 <label htmlFor="auth-name" className="label">Full name</label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                  <input id="auth-name" className={`input pl-10 ${errors.name ? 'border-error' : ''}`} aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => { setName(e.target.value); if (errors.name) setErrors(prev => ({ ...prev, name: '' })) }} />
+                  <input id="auth-name" className={`input pl-10 min-h-[44px] ${errors.name ? 'border-error' : ''}`} aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => { setName(e.target.value); if (errors.name) setErrors(prev => ({ ...prev, name: '' })) }} />
                 </div>
                 {errors.name && <p className="text-error text-xs mt-1">{errors.name}</p>}
               </div>
@@ -180,31 +206,56 @@ export default function AuthPage() {
               <label htmlFor="auth-email" className="label">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                <input id="auth-email" type="email" className={`input pl-10 ${errors.email ? 'border-error' : ''}`} placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: '' })) }} />
+                <input id="auth-email" type="email" className={`input pl-10 min-h-[44px] ${errors.email ? 'border-error' : ''}`} placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: '' })) }} />
               </div>
               {errors.email && <p className="text-error text-xs mt-1">{errors.email}</p>}
             </div>
             <div>
-              <label htmlFor="auth-password" className="label">Password</label>
-              <div className="relative">
+              <div className="flex items-center justify-between">
+                <label htmlFor="auth-password" className="label mb-0">Password</label>
+                {mode === 'signin' && (
+                  <button type="button" onClick={handleResetPassword} disabled={resetting} className="text-xs text-primary hover:underline min-h-[44px] sm:min-h-0">
+                    {resetting ? 'Sending...' : 'Forgot password?'}
+                  </button>
+                )}
+              </div>
+              <div className="relative mt-1.5">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
-                <input id="auth-password" type="password" className={`input pl-10 ${errors.password ? 'border-error' : ''}`} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(prev => ({ ...prev, password: '' })) }} />
+                <input id="auth-password" type="password" className={`input pl-10 min-h-[44px] ${errors.password ? 'border-error' : ''}`} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(prev => ({ ...prev, password: '' })) }} />
               </div>
               {errors.password && <p className="text-error text-xs mt-1">{errors.password}</p>}
             </div>
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
+            {mode === 'signup' && (
+              <div>
+                <label htmlFor="auth-confirm" className="label">Confirm Password</label>
+                <div className="relative mt-1.5">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
+                  <input id="auth-confirm" type="password" className={`input pl-10 min-h-[44px] ${errors.confirmPassword ? 'border-error' : ''}`} placeholder="••••••••" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: '' })) }} />
+                </div>
+                {errors.confirmPassword && <p className="text-error text-xs mt-1">{errors.confirmPassword}</p>}
+              </div>
+            )}
+            <button type="submit" disabled={loading} className="btn-primary w-full mt-2 min-h-[44px] flex items-center justify-center">
+              {loading ? (
+                 <span className="flex items-center gap-2">
+                   <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                   </svg>
+                   Please wait…
+                 </span>
+               ) : mode === 'signup' ? 'Create Account' : 'Sign In'}
             </button>
           </motion.form>
 
           <motion.p variants={fsu} className="text-center text-sm text-text-muted mt-5">
             {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
-              className="text-primary hover:underline font-medium"
+            <Link
+              to={`/auth?mode=${mode === 'signup' ? 'signin' : 'signup'}`}
+              className="text-primary hover:underline font-medium p-2 -ml-2"
             >
-              {mode === 'signup' ? 'Sign in' : 'Sign up'}
-            </button>
+              {mode === 'signup' ? 'Sign in' : 'Create one'}
+            </Link>
           </motion.p>
         </motion.div>
       </div>

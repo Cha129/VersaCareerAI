@@ -22,20 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(data.session)
         loadProfile(data.session.user.id)
       } else {
-        // No existing session — create an anonymous one so every visitor
-        // gets a real Supabase user and a profiles row (plan='FREE') without
-        // needing to go through a login flow.
-        try {
-          const { data: anonData, error } = await supabase.auth.signInAnonymously()
-          if (error) throw error
-          if (mounted && anonData.session) {
-            setSession(anonData.session)
-            loadProfile(anonData.session.user.id)
-          }
-        } catch (err) {
-          console.warn('Anonymous sign-in failed (is it enabled in Supabase Dashboard → Authentication → Providers → Anonymous?)', err)
-          if (mounted) setLoading(false)
-        }
+        if (mounted) setLoading(false)
       }
     }).catch(err => {
       console.warn("Supabase auth error:", err)
