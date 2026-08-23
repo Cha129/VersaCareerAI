@@ -139,7 +139,7 @@ export default function Landing() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Link to="/pricing" className="btn-ghost text-sm hidden sm:inline-flex">Pricing</Link>
-            <Link to="/dashboard" className="btn-primary">Get started <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/dashboard" className="btn-primary">Go to Dashboard <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </div>
       </header>
