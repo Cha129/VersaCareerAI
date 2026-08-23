@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
-import { ArrowLeft, Mail, Lock, User as UserIcon } from 'lucide-react'
+import { ArrowLeft, Mail, Lock, User as UserIcon, MailCheck, RefreshCw } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useMotionVariants } from '../lib/motionVariants'
 
-type Mode = 'signin' | 'signup'
+type Mode = 'signin' | 'signup' | 'check-inbox'
 type OAuthProvider = 'google' | 'github' | 'azure' | 'linkedin_oidc'
 
 function GoogleIcon({ className }: { className?: string }) {
@@ -54,22 +54,50 @@ const OAUTH_PROVIDERS: { provider: OAuthProvider; label: string; Icon: (p: { cla
   { provider: 'azure', label: 'Continue with Microsoft', Icon: MicrosoftIcon },
 ]
 
+const RESEND_COOLDOWN_SECONDS = 60
+
 export default function AuthPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const mode: Mode = searchParams.get('mode') === 'signin' ? 'signin' : 'signup'
-  
+  const queryMode = searchParams.get('mode')
+  const [localMode, setLocalMode] = useState<Mode>(queryMode === 'signin' ? 'signin' : 'signup')
+  // Sync local mode with query param
+  const mode: Mode = localMode
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
-  
+  const [signupEmail, setSignupEmail] = useState('') // stores email after signup for check-inbox view
+
   const [loading, setLoading] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  
+
+  // Resend cooldown
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const [resending, setResending] = useState(false)
+
   const navigate = useNavigate()
   const { fadeSlideUp: fsu, staggerContainer: stagger, fadeOnly: fo } = useMotionVariants()
+
+  const switchMode = (m: Mode) => {
+    setLocalMode(m)
+    setErrors({})
+    if (m === 'signin' || m === 'signup') {
+      setSearchParams({ mode: m })
+    }
+  }
+
+  const startResendCooldown = () => {
+    setResendCooldown(RESEND_COOLDOWN_SECONDS)
+    const interval = setInterval(() => {
+      setResendCooldown(prev => {
+        if (prev <= 1) { clearInterval(interval); return 0 }
+        return prev - 1
+      })
+    }, 1000)
+  }
 
   const handleOAuthLogin = async (provider: OAuthProvider) => {
     if (oauthLoading) return
@@ -77,7 +105,7 @@ export default function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}/dashboard` },
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
       })
       if (error) throw error
     } catch (err: any) {
@@ -91,27 +119,19 @@ export default function AuthPage() {
     if (mode === 'signup' && !name.trim()) newErrors.name = 'Name is required'
     if (!email.trim()) newErrors.email = 'Email is required'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = 'Invalid email address'
-    
     if (!password) newErrors.password = 'Password is required'
     else if (mode === 'signup' && password.length < 6) newErrors.password = 'Password must be at least 6 characters'
-    
-    if (mode === 'signup' && password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-    
+    if (mode === 'signup' && password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleResetPassword = async () => {
-    if (!email.trim()) {
-      setErrors({ email: 'Please enter your email first' })
-      return
-    }
+    if (!email.trim()) { setErrors({ email: 'Please enter your email first' }); return }
     setResetting(true)
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       })
       if (error) throw error
       toast.success('Password reset email sent.')
@@ -119,6 +139,21 @@ export default function AuthPage() {
       toast.error(err.message || 'Failed to send reset email.')
     } finally {
       setResetting(false)
+    }
+  }
+
+  const handleResendConfirmation = async () => {
+    if (resendCooldown > 0 || resending) return
+    setResending(true)
+    try {
+      const { error } = await supabase.auth.resend({ type: 'signup', email: signupEmail })
+      if (error) throw error
+      toast.success('Confirmation email resent.')
+      startResendCooldown()
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to resend confirmation email.')
+    } finally {
+      setResending(false)
     }
   }
 
@@ -132,21 +167,39 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: name || undefined } },
+          options: {
+            data: { full_name: name || undefined },
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
         })
         if (error) throw error
         if (data.user && !data.session) {
-          toast.success('Account created. Please check your email to sign in.')
+          // Email confirmation required — switch to check-inbox view
+          setSignupEmail(email)
           setPassword('')
           setConfirmPassword('')
-          setSearchParams({ mode: 'signin' })
+          startResendCooldown()
+          switchMode('check-inbox')
           return
         }
+        // Supabase "Confirm email" is OFF — session created immediately
         toast.success('Welcome to VersaCareer AI!')
         navigate('/onboarding')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
+        if (error) {
+          // Detect "Email not confirmed" specifically to give a targeted message
+          const msg = error.message?.toLowerCase() ?? ''
+          if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+            setErrors({
+              password: 'Your email is not yet confirmed. Check your inbox or resend the confirmation email below.',
+            })
+            // Pre-fill the inbox view email so resend works
+            setSignupEmail(email)
+            return
+          }
+          throw error
+        }
         toast.success('Signed in successfully.')
         navigate('/dashboard')
       }
@@ -157,6 +210,54 @@ export default function AuthPage() {
     }
   }
 
+  // ─── Check Inbox View ─────────────────────────────────────────────────────
+  if (mode === 'check-inbox') {
+    return (
+      <div className="min-h-screen bg-bg flex flex-col">
+        <header className="px-4 md:px-8 h-16 flex items-center">
+          <button onClick={() => switchMode('signup')} className="btn-ghost"><ArrowLeft className="h-4 w-4" /> Back</button>
+        </header>
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
+          <motion.div initial="hidden" animate="visible" variants={fo} className="w-full max-w-md text-center">
+            <motion.div variants={fsu} className="flex flex-col items-center gap-5">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <MailCheck className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="text-2xl font-semibold">Check your inbox</h1>
+              <p className="text-text-muted text-sm leading-relaxed max-w-xs">
+                We've sent a confirmation link to{' '}
+                <span className="text-text font-medium">{signupEmail}</span>.
+                Click it to activate your account.
+              </p>
+              <div className="card p-5 w-full text-left space-y-3 mt-2">
+                <p className="text-xs text-text-faint">Didn't receive it? Check your spam folder, or resend below.</p>
+                <button
+                  onClick={handleResendConfirmation}
+                  disabled={resendCooldown > 0 || resending}
+                  className="btn-secondary w-full flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-4 w-4 ${resending ? 'animate-spin' : ''}`} />
+                  {resending
+                    ? 'Sending…'
+                    : resendCooldown > 0
+                    ? `Resend in ${resendCooldown}s`
+                    : 'Resend confirmation email'}
+                </button>
+              </div>
+              <p className="text-sm text-text-faint">
+                Wrong email?{' '}
+                <button onClick={() => switchMode('signup')} className="text-primary hover:underline font-medium">
+                  Go back and try again
+                </button>
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Sign In / Sign Up View ───────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-bg flex flex-col">
       <header className="px-4 md:px-8 h-16 flex items-center">
@@ -214,7 +315,7 @@ export default function AuthPage() {
               <div className="flex items-center justify-between">
                 <label htmlFor="auth-password" className="label mb-0">Password</label>
                 {mode === 'signin' && (
-                  <button type="button" onClick={handleResetPassword} disabled={resetting} className="text-xs text-primary hover:underline min-h-[44px] sm:min-h-0">
+                  <button type="button" onClick={handleResetPassword} disabled={resetting} className="text-xs text-primary hover:underline">
                     {resetting ? 'Sending...' : 'Forgot password?'}
                   </button>
                 )}
@@ -223,7 +324,22 @@ export default function AuthPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-faint" />
                 <input id="auth-password" type="password" className={`input pl-10 min-h-[44px] ${errors.password ? 'border-error' : ''}`} placeholder="••••••••" value={password} onChange={(e) => { setPassword(e.target.value); if (errors.password) setErrors(prev => ({ ...prev, password: '' })) }} />
               </div>
-              {errors.password && <p className="text-error text-xs mt-1">{errors.password}</p>}
+              {errors.password && (
+                <div className="mt-1">
+                  <p className="text-error text-xs">{errors.password}</p>
+                  {/* If "not confirmed" error, show resend option inline */}
+                  {(errors.password.includes('not yet confirmed') || errors.password.includes('not confirmed')) && signupEmail && (
+                    <button
+                      type="button"
+                      onClick={handleResendConfirmation}
+                      disabled={resendCooldown > 0 || resending}
+                      className="text-xs text-primary hover:underline mt-1 disabled:opacity-50"
+                    >
+                      {resending ? 'Sending…' : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend confirmation email'}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
             {mode === 'signup' && (
               <div>
@@ -237,25 +353,25 @@ export default function AuthPage() {
             )}
             <button type="submit" disabled={loading} className="btn-primary w-full mt-2 min-h-[44px] flex items-center justify-center">
               {loading ? (
-                 <span className="flex items-center gap-2">
-                   <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                   </svg>
-                   Please wait…
-                 </span>
-               ) : mode === 'signup' ? 'Create Account' : 'Sign In'}
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Please wait…
+                </span>
+              ) : mode === 'signup' ? 'Create Account' : 'Sign In'}
             </button>
           </motion.form>
 
           <motion.p variants={fsu} className="text-center text-sm text-text-muted mt-5">
             {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <Link
-              to={`/auth?mode=${mode === 'signup' ? 'signin' : 'signup'}`}
+            <button
+              onClick={() => switchMode(mode === 'signup' ? 'signin' : 'signup')}
               className="text-primary hover:underline font-medium p-2 -ml-2"
             >
               {mode === 'signup' ? 'Sign in' : 'Create one'}
-            </Link>
+            </button>
           </motion.p>
         </motion.div>
       </div>

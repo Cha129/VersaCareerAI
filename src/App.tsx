@@ -4,6 +4,7 @@ import { useAuthStore } from './lib/authStore'
 import Landing from './pages/Landing'
 import Pricing from './pages/Pricing'
 import AuthPage from './pages/Auth'
+import AuthCallback from './pages/AuthCallback'
 import Onboarding from './pages/Onboarding'
 import DashboardLayout, { FullLoader } from './components/DashboardLayout'
 import Dashboard from './pages/Dashboard'
@@ -53,6 +54,7 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
       <Route element={<Protected><DashboardLayout /></Protected>}>
         <Route path="/dashboard" element={<Dashboard />} />
