@@ -100,7 +100,7 @@ export default function Pricing() {
               <div className="text-[11px] text-text-faint">by Pragma</div>
             </div>
           </Link>
-          <Link to="/auth" className="btn-primary">Sign in <ArrowRight className="h-4 w-4" /></Link>
+          <Link to="/dashboard" className="btn-primary">Get started <ArrowRight className="h-4 w-4" /></Link>
         </div>
       </header>
 
@@ -146,7 +146,7 @@ export default function Pricing() {
             price="₹0"
             period="forever"
             features={FREE_FEATURES}
-            cta={<Link to="/auth" className="btn-secondary w-full">Start free</Link>}
+            cta={<Link to="/dashboard" className="btn-secondary w-full">Start free</Link>}
           />
 
           {/* Pro */}
@@ -159,7 +159,7 @@ export default function Pricing() {
             highlight
             features={PRO_FEATURES}
             sub={billing === 'yearly' ? `Save ${yearlySavings('PRO')}% vs monthly` : undefined}
-            cta={<Link to="/auth" className="btn-primary w-full"><Crown className="h-4 w-4" /> Upgrade to Pro</Link>}
+            cta={<Link to="/billing" className="btn-primary w-full"><Crown className="h-4 w-4" /> Upgrade to Pro</Link>}
           />
 
           {/* Pro+ */}
@@ -171,7 +171,7 @@ export default function Pricing() {
             badge="BEST VALUE"
             features={PRO_PLUS_FEATURES}
             sub={billing === 'yearly' ? `Save ${yearlySavings('PRO_PLUS')}% vs monthly` : undefined}
-            cta={<Link to="/auth" className="btn-primary w-full"><Sparkles className="h-4 w-4" /> Go Pro+</Link>}
+            cta={<Link to="/billing" className="btn-primary w-full"><Sparkles className="h-4 w-4" /> Go Pro+</Link>}
           />
 
           {/* Founder Pass */}
@@ -244,7 +244,7 @@ export default function Pricing() {
             {founderRemaining === 0 ? (
               <div className="text-center text-sm text-text-muted py-2.5 border border-border rounded-[2px] bg-bg-soft">Founder Pass — SOLD OUT</div>
             ) : (
-              <Link to="/auth" className="btn-primary w-full" style={{ background: 'var(--warning)' }}>
+              <Link to="/billing" className="btn-primary w-full" style={{ background: 'var(--warning)' }}>
                 <InfinityIcon className="h-4 w-4" /> Claim Founder Pass
               </Link>
             )}
@@ -324,7 +324,7 @@ export default function Pricing() {
       <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeOnly} className="max-w-6xl mx-auto px-4 md:px-8 py-20 text-center border-t border-border relative z-10">
         <h2 className="text-3xl font-semibold mb-4">Start free. No credit card.</h2>
         <p className="text-text-muted mb-8">Get 3 resume analyses + 10 mentor messages every month, on us.</p>
-        <Link to="/auth" className="btn-primary text-base px-6 py-3 inline-flex">Create your account <ArrowRight className="h-4 w-4" /></Link>
+        <Link to="/dashboard" className="btn-primary text-base px-6 py-3 inline-flex">Get started free <ArrowRight className="h-4 w-4" /></Link>
       </motion.section>
 
       <footer className="border-t border-border relative z-10">

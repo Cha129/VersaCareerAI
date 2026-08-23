@@ -104,6 +104,9 @@ export default function DashboardLayout() {
               {profile?.plan ?? 'FREE'}
             </span>
           </div>
+          {/* Sign out: clears the current session. auth.tsx will immediately create a
+              new anonymous session on the next page load, since there is no login screen.
+              To restore a real sign-out-to-login flow, re-add the /auth route in App.tsx. */}
           <button onClick={handleSignOut} className="btn-ghost w-full justify-start">
             <LogOut className="h-4 w-4" /> Sign out
           </button>

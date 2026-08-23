@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useAuthStore } from './lib/authStore'
 import Landing from './pages/Landing'
 import Pricing from './pages/Pricing'
-import AuthPage from './pages/Auth'
+// Auth.tsx is intentionally NOT imported here — the file is kept intact on disk
+// for easy re-addition later. To restore login, import AuthPage and replace the
+// redirect below with: <Route path="/auth" element={<AuthPage />} />
 import Onboarding from './pages/Onboarding'
 import DashboardLayout, { FullLoader } from './components/DashboardLayout'
 import Dashboard from './pages/Dashboard'
@@ -52,7 +54,8 @@ export default function App() {
     <Routes location={location}>
       <Route path="/" element={<Landing />} />
       <Route path="/pricing" element={<Pricing />} />
-      <Route path="/auth" element={<AuthPage />} />
+      {/* /auth redirects to /dashboard — Auth.tsx file is intact on disk, just unrouted */}
+      <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
       <Route path="/onboarding" element={<Protected><Onboarding /></Protected>} />
       <Route element={<Protected><DashboardLayout /></Protected>}>
         <Route path="/dashboard" element={<Dashboard />} />
