@@ -116,8 +116,8 @@ export default function DashboardLayout() {
       {/* Mobile top bar */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="md:hidden flex items-center justify-between border-b border-border bg-bg-soft px-4 py-3">
-          <Link to="/" aria-label="VersaCareer AI home" className="inline-flex items-center">
-            <img src="/assets/brand/VersaCareer_AI_Icon_Gold.png" alt="VersaCareer AI" className="h-7 w-7 object-contain" />
+          <Link to="/" aria-label="VersaCareer home" className="inline-flex items-center">
+            <img src="/assets/brand/VersaCareer_AI_Icon_Gold.png" alt="VersaCareer" className="h-7 w-7 object-contain" />
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle className="scale-90" />

@@ -329,7 +329,7 @@ export default function Pricing() {
 
       <footer className="border-t border-border relative z-10">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 text-center text-sm text-text-faint">
-          VersaCareer AI is a product of Pragma, the AI SaaS wing of Optimus, founded by Vadlamudi Sai Chanakya and Devella Sankeerth.
+          VersaCareer is a product of Pragma, the AI SaaS wing of Optimus, founded by Vadlamudi Sai Chanakya and Devella Sankeerth.
         </div>
       </footer>
     </div>

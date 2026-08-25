@@ -183,7 +183,7 @@ export default function AuthPage() {
           return
         }
         // Supabase "Confirm email" is OFF — session created immediately
-        toast.success('Welcome to VersaCareer AI!')
+        toast.success('Welcome to VersaCareer!')
         navigate('/onboarding')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -266,7 +266,7 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <motion.div initial="hidden" animate="visible" variants={fo} className="w-full max-w-md">
           <motion.div variants={fsu} className="text-center mb-8">
-            <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer AI" className="h-14 w-auto rounded-[3px] mx-auto mb-4 object-contain" />
+            <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer" className="h-14 w-auto rounded-[3px] mx-auto mb-4 object-contain" />
             <h1 className="text-2xl font-semibold">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h1>
           </motion.div>
 

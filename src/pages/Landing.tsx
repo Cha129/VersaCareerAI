@@ -181,7 +181,7 @@ export default function Landing() {
               transition={{ duration: 0.5, delay: 0.15 }}
               className="text-text-muted text-lg max-w-lg mb-8 leading-relaxed"
             >
-              VersaCareer AI analyzes your resume, maps your skill gaps, builds a personalized roadmap, and mentors you — so you always know where you stand and what to do next.
+              VersaCareer analyzes your resume, maps your skill gaps, builds a personalized roadmap, and mentors you — so you always know where you stand and what to do next.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -295,8 +295,8 @@ export default function Landing() {
 
       <footer className="border-t border-border relative z-10 bg-[#0A0A08]">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 flex flex-col items-center gap-4 text-center text-sm text-text-faint">
-          <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer AI" className="h-8 w-auto max-w-[200px] object-contain" />
-          <p>VersaCareer AI is a product of Pragma, the AI SaaS wing of Optimus, founded by Vadlamudi Sai Chanakya and Devella Sankeerth.</p>
+          <img src="/assets/brand/VersaCareer_AI_Logo_Gold_OnDark.png" alt="VersaCareer" className="h-8 w-auto max-w-[200px] object-contain" />
+          <p>VersaCareer is a product of Pragma, the AI SaaS wing of Optimus, founded by Vadlamudi Sai Chanakya and Devella Sankeerth.</p>
         </div>
       </footer>
     </div>
